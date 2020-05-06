@@ -1,31 +1,46 @@
 import React, {useState} from "react"
-import {BrowserRouter, Switch, Route, Link} from "react-router-dom"
+import {Switch, Route, Link, useRouteMatch} from "react-router-dom"
 
 const Menu = (props) => {
-    const {anecdotes, addNewAnecdote} = props
+    const {anecdotes, addNewAnecdote, anecdote} = props
     const padding = {
         paddingRight: 5
     }
 
     return (
         <div>
-            <BrowserRouter>
-                <Link to = "/" style = {padding}> Anecdotes </Link>
-                <Link to = "/create" style = {padding}> Create new anecdote </Link>
-                <Link to = "/about" style = {padding}> More information </Link>
 
-                <Switch>
-                    <Route path = "/create">
-                        <CreateNew addNewAnecdote = {addNewAnecdote} />
-                    </Route>
-                    <Route path = "/about">
-                        <About />
-                    </Route>
-                    <Route path = "/">
-                        <AnecdoteList anecdotes = {anecdotes} />
-                    </Route>
-                </Switch>
-            </BrowserRouter>
+            <Link to = "/" style = {padding}> Anecdotes </Link>
+            <Link to = "/create" style = {padding}> Create new anecdote </Link>
+            <Link to = "/about" style = {padding}> More information </Link>
+            
+            <Switch>
+                <Route path = "/create">
+                    <CreateNew addNewAnecdote = {addNewAnecdote} />
+                </Route>
+                <Route path = "/about">
+                    <About />
+                </Route>
+                <Route path = "/anecdotes/:id">
+                    <Anecdote anecdote = {anecdote} />
+                </Route>
+                <Route path = "/">
+                    <AnecdoteList anecdotes = {anecdotes} />
+                </Route>
+            </Switch>
+
+        </div>
+    )
+}
+
+const Anecdote = (props) => {
+    const {anecdote} = props
+    return (
+        <div>
+            <h2> {anecdote.content} </h2>
+            <p> Author: <strong> {anecdote.author} </strong> </p>
+            <p> Votes given to this anecdote: {anecdote.votes} </p>
+            <p> For more information, visit {anecdote.info} </p>
         </div>
     )
 }
@@ -36,7 +51,9 @@ const AnecdoteList = ({anecdotes}) => (
         <ul>
             {anecdotes.map(anecdote =>
                 <li key = {anecdote.id}>
-                    {anecdote.content}
+                    <Link to = {`/anecdotes/${anecdote.id}`}>
+                        {anecdote.content}
+                    </Link>
                 </li>
             )}
         </ul>
@@ -69,13 +86,13 @@ const About = () => (
 
 const Footer = () => (
     <div>
+        <br />
         Anecdote app for <a href="https://courses.helsinki.fi/fi/tkt21009">
             Full Stack -websovelluskehitys
         </a>.
         <br />
-        See <a
-        href="https://github.com/fullstack-hy2020/routed-anecdotes/blob/master/src/App.js">
-            https://github.com/fullstack-hy2019/routed-anecdotes/blob/master/src/App.js
+        See <a href="https://github.com/fullstack-hy2020/routed-anecdotes">
+            https://github.com/fullstack-hy2019/routed-anecdotes
         </a> for the source code.
     </div>
 )
@@ -132,8 +149,8 @@ const CreateNew = (props) => {
 }
 
 const App = () => {
-    const [page, setPage] = useState("anecdoteList")
-    console.log(page)
+    //const [page, setPage] = useState("anecdoteList")
+    
     const [anecdotes, setAnecdotes] = useState([
         {
             content: "If it hurts, do it more often",
@@ -151,20 +168,20 @@ const App = () => {
         }
     ])
     
-    const [notification, setNotification] = useState("")
-    console.log(notification, setNotification)
-    
+    //const [notification, setNotification] = useState("")
+
     const addNewAnecdote = (anecdote) => {
         anecdote.id = (Math.random() * 10000).toFixed(0)
         setAnecdotes(anecdotes.concat(anecdote))
     }
-    
+    /*
     const anecdoteById = (id) => (
         anecdotes.find(anecdote =>
             anecdote.id === id
         )
     )
-    
+    */
+    /*
     const vote = (id) => {
         const anecdoteToVote = anecdoteById(id)
         const votedAnecdote = {
@@ -177,14 +194,14 @@ const App = () => {
                 : anecdote)
         )
     }
-    console.log(vote)
-
+    */
+    /*
     const goToPage = (page) => (event) => {
         event.preventDefault()
         setPage(page)
     }
-    console.log(goToPage)
-
+    */
+    /*
     const content = () => {
         if (page === "anecdoteList") {
             return <AnecdoteList anecdotes = {anecdotes} />
@@ -194,12 +211,24 @@ const App = () => {
             return <About />
         }
     }
-    console.log(content)
+    */
+    
+    const match = useRouteMatch("/anecdotes/:id")
+    const anecdote = ((match)
+        ? anecdotes.find(anecdote =>
+            anecdote.id === Number(match.params.id)
+        )
+        : null
+    )
 
     return (
         <div>
             <h1> Software anecdotes </h1>
-            <Menu anecdotes = {anecdotes} addNewAnecdote = {addNewAnecdote} />
+            <Menu
+                anecdotes = {anecdotes}
+                addNewAnecdote = {addNewAnecdote}
+                anecdote = {anecdote}
+            />
             <Footer />
         </div>
     )
