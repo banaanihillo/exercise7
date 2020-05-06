@@ -1,8 +1,11 @@
 import React, {useState} from "react"
-import {Switch, Route, Link, useRouteMatch} from "react-router-dom"
+import {Switch, Route, Link, useRouteMatch, useHistory} from "react-router-dom"
+require("./styles.css")
 
 const Menu = (props) => {
-    const {anecdotes, addNewAnecdote, anecdote} = props
+    
+    const {anecdotes, addNewAnecdote, anecdote, setNotification} = props
+
     const padding = {
         paddingRight: 5
     }
@@ -16,7 +19,10 @@ const Menu = (props) => {
             
             <Switch>
                 <Route path = "/create">
-                    <CreateNew addNewAnecdote = {addNewAnecdote} />
+                    <CreateNew
+                        addNewAnecdote = {addNewAnecdote}
+                        setNotification = {setNotification}
+                    />
                 </Route>
                 <Route path = "/about">
                     <About />
@@ -98,19 +104,30 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
+
+    const history = useHistory()
     const [content, setContent] = useState("")
     const [author, setAuthor] = useState("")
     const [info, setInfo] = useState("")
-    const {addNewAnecdote} = props
+    const {addNewAnecdote, setNotification} = props
 
     const handleSubmit = (event) => {
         event.preventDefault()
         addNewAnecdote({
-            content,
-            author,
-            info,
+            content: content,
+            author: author,
+            info: info,
             votes: 0
         })
+        history.push("/")
+
+        setNotification(`Successfully added ${content}.`)
+        setTimeout(() => {
+            setNotification(null)
+        }, 10000)
+        setContent("")
+        setAuthor("")
+        setInfo("")
     }
 
     return (
@@ -118,23 +135,27 @@ const CreateNew = (props) => {
             <h2> Create a new anecdote </h2>
             <form onSubmit = {handleSubmit}>
                 <div>
-                    Content
+                    Content:
                     <input
                         name = "content"
                         value = {content}
-                        onChange = {(event) => setContent(event.target.value)}
+                        onChange = {(event) => {
+                            setContent(event.target.value)
+                        }}
                     />
                 </div>
                 <div>
-                    Author
+                    Author:
                     <input
                         name = "author"
                         value = {author}
-                        onChange = {(event) => setAuthor(event.target.value)}
+                        onChange = {(event) => {
+                            setAuthor(event.target.value)
+                        }}
                     />
                 </div>
                 <div>
-                    URL for more info
+                    URL for more info:
                     <input
                         name = "info"
                         value = {info}
@@ -168,10 +189,10 @@ const App = () => {
         }
     ])
     
-    //const [notification, setNotification] = useState("")
+    const [notification, setNotification] = useState(null)
 
     const addNewAnecdote = (anecdote) => {
-        anecdote.id = (Math.random() * 10000).toFixed(0)
+        anecdote.id = Math.ceil(Math.random() * 10000)
         setAnecdotes(anecdotes.concat(anecdote))
     }
     /*
@@ -214,10 +235,11 @@ const App = () => {
     */
     
     const match = useRouteMatch("/anecdotes/:id")
-    const anecdote = ((match)
-        ? anecdotes.find(anecdote =>
-            anecdote.id === Number(match.params.id)
-        )
+    const anecdote = (
+        (match)
+        ? anecdotes.find(anecdote => {
+            return anecdote.id === Number(match.params.id)
+        })
         : null
     )
 
@@ -228,7 +250,12 @@ const App = () => {
                 anecdotes = {anecdotes}
                 addNewAnecdote = {addNewAnecdote}
                 anecdote = {anecdote}
+                setNotification = {setNotification}
             />
+            {notification
+                ? <p className = "notification"> {notification} </p>
+                : null
+            }
             <Footer />
         </div>
     )

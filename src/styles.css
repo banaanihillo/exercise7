@@ -1,0 +1,9 @@
+input {
+    margin-left: 5px
+}
+
+.notification {
+    color: hotpink;
+    background-color: black;
+    font-size: 20px
+}
