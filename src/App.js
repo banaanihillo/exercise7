@@ -136,22 +136,18 @@ const CreateNew = (props) => {
             <form>
                 <div>
                     Content:
-                    <input
-                        type = {contentInput.type}
-                        value = {contentInput.value}
-                        onChange = {contentInput.onChange}
-                    />
-                    <button onClick = {contentInput.reset}> Reset content input </button>
+                    <input {...contentInput} />
+                    <button onClick = {contentInput.onReset}> Reset content input </button>
                 </div>
                 <div>
                     Author:
                     <input {...authorInput} />
-                    <button onClick = {authorInput.reset}> Reset author input </button>
+                    <button onClick = {authorInput.onReset}> Reset author input </button>
                 </div>
                 <div>
                     URL for more info:
                     <input {...infoInput} />
-                    <button onClick = {infoInput.reset}> Reset URL input </button>
+                    <button onClick = {infoInput.onReset}> Reset URL input </button>
                 </div>
                 <button onClick = {handleSubmit}> Create </button>
             </form>
