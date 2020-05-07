@@ -1,5 +1,6 @@
 import React, {useState} from "react"
 import {Switch, Route, Link, useRouteMatch, useHistory} from "react-router-dom"
+import {useField} from "./hooks/index"
 require("./styles.css")
 
 const Menu = (props) => {
@@ -104,30 +105,29 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
+    const contentInput = useField("content")
+    const authorInput = useField("author")
+    const infoInput = useField("info")
 
     const history = useHistory()
-    const [content, setContent] = useState("")
-    const [author, setAuthor] = useState("")
-    const [info, setInfo] = useState("")
+
     const {addNewAnecdote, setNotification} = props
 
     const handleSubmit = (event) => {
         event.preventDefault()
         addNewAnecdote({
-            content: content,
-            author: author,
-            info: info,
+            content: contentInput.value,
+            author: authorInput.value,
+            info: infoInput.value,
             votes: 0
         })
         history.push("/")
 
-        setNotification(`Successfully added ${content}.`)
+        setNotification(`Successfully added ${contentInput.value}.`)
         setTimeout(() => {
             setNotification(null)
         }, 10000)
-        setContent("")
-        setAuthor("")
-        setInfo("")
+
     }
 
     return (
@@ -136,31 +136,15 @@ const CreateNew = (props) => {
             <form onSubmit = {handleSubmit}>
                 <div>
                     Content:
-                    <input
-                        name = "content"
-                        value = {content}
-                        onChange = {(event) => {
-                            setContent(event.target.value)
-                        }}
-                    />
+                    <input {...contentInput} />
                 </div>
                 <div>
                     Author:
-                    <input
-                        name = "author"
-                        value = {author}
-                        onChange = {(event) => {
-                            setAuthor(event.target.value)
-                        }}
-                    />
+                    <input {...authorInput} />
                 </div>
                 <div>
                     URL for more info:
-                    <input
-                        name = "info"
-                        value = {info}
-                        onChange = {(event) => setInfo(event.target.value)}
-                    />
+                    <input {...infoInput} />
                 </div>
                 <button> Create </button>
             </form>
